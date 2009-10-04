@@ -7,7 +7,7 @@
   <script src="../assets/jsunittest.js" type="text/javascript"></script>
   
   
-  <script src="../../dist/state_machine.js" type="text/javascript"></script>
+  <script src="../../src/state_machine.js" type="text/javascript"></script>
   
   <link rel="stylesheet" href="../assets/unittest.css" type="text/css" />
 </head>
@@ -32,21 +32,72 @@
 <script type="text/javascript">
 // <![CDATA[
 
-  new Test.Unit.Runner({
-    // replace this with your real tests
+
+trafficLight.prototype = new StateMachine();
+trafficLight.prototype.states = {
+    go: {
+        enter: function(){
+            this.green = true;
+        },
+        exit: function(){
+            this.green = false;
+        }
+    },
+    slow: {
+        enter: function(){
+            this.yellow = true;   
+        },
+        exit: function(){
+            this.yellow = false;
+        }
+    },
+    stop:{
+        enter: function(){
+            this.red = true;
+        },
+        exit: function(){
+            this.red = false;
+        }
+    }
+}
+function trafficLight (){
+    this.red = false;
+    this.yellow = false;
+    this.green = false;
+    this.changeState("stop");
+}
+
+light1 = new trafficLight();
+
+new Test.Unit.Runner({
     setup: function() {
-      
     },
-    
     teardown: function() {
-      
     },
-    
-    testTruth: function() { with(this) {
-      assert(true);
-    }}
-      
-  }, {testLog: "testlog"}); 
+
+    testAttachment: function() { with(this) {
+        assert(light1.stateMachine);
+    }},
+    testInitialState: function() { with(this) {
+        assert(light1.red);
+        assert(!light1.yellow);
+        assert(!light1.green);
+    }},
+    testChangeState: function() { with(this) {
+        light1.changeState("go");
+        assert(!light1.red);
+        assert(!light1.yellow);
+        assert(light1.green);
+        light1.changeState("slow");
+        assert(!light1.red);
+        assert(light1.yellow);
+        assert(!light1.green);
+        light1.changeState("stop");
+        assert(light1.red);
+        assert(!light1.yellow);
+        assert(!light1.green);
+    }},
+}, {testLog: "testlog"}); 
   // For each Test.UnitRunner instance, specify the element id where results will be
   // published; e.g. <div id="testlog"/> above.
   // That is, you can have multiple "new Test.Unit.Runner() { ... }" on this page, just
